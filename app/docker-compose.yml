@@ -1,0 +1,92 @@
+version: '3.9'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: app
+    networks:
+      - backnet
+      - frontnet
+    ports:
+      - "8080:8080"
+    environment:
+      - LOG_LEVEL=${LOG_LEVEL}
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - OPENAI_ASSISTANT_ID=${OPENAI_ASSISTANT_ID}
+      - MONGODB_URL=${MONGODB_URL}
+      - MONGODB_NAME=${MONGODB_NAME}
+      - MONGODB_NAME_TEST=${MONGODB_NAME_TEST}
+      - MONGO_USER=${MONGO_USER}
+      - MONGO_PASSWORD=${MONGO_PASSWORD}
+      - JWT_SECRET_KEY=${JWT_SECRET_KEY}
+      - JWT_ALGORITHM=${JWT_ALGORITHM}
+      - JWT_ACCESS_TOKEN_EXPIRE_MINUTES=${JWT_ACCESS_TOKEN_EXPIRE_MINUTES}
+      - GOOGLE_CUSTOM_SEARCH_API_KEY=${GOOGLE_CUSTOM_SEARCH_API_KEY}
+      - GOOGLE_SEARCH_ENGINE_ID=${GOOGLE_SEARCH_ENGINE_ID}
+      - STABLE_DIFFUSION_ADDRESS=${STABLE_DIFFUSION_ADDRESS}
+      - CLOUDINARY_NAME=${CLOUDINARY_NAME}
+      - CLOUDINARY_API_KEY=${CLOUDINARY_API_KEY}
+      - CLOUDINARY_API_SECRET=${CLOUDINARY_API_SECRET}
+      - SERPAPI_KEY=${SERPAPI_KEY}
+      - REDIS_URL=redis://redis:6379
+    depends_on:
+      - mongodb
+      - redis
+      - vc_db
+
+  redis:
+    image: redis:alpine
+    networks:
+      - backnet
+      - default
+    ports:
+      - "6379:6379"
+    entrypoint: redis-server --appendonly yes
+
+  mongodb:
+    image: mongo:latest
+    networks:
+      - backnet
+      - default
+    ports:
+      - "27017:27017"
+    container_name: ${MONGODB_SERVICE_NAME}
+    volumes:
+      - ./data/db:/data/db
+    restart: unless-stopped
+    environment:
+      - MAX_CONNECTIONS_COUNT=10
+      - MIN_CONNECTIONS_COUNT=3
+
+  mongo-express:
+    image: mongo-express
+    container_name: mexpress
+    restart: unless-stopped
+    networks:
+      - default
+    ports:
+      - "8081:8081"
+    environment:
+      - ME_CONFIG_MONGODB_SERVER=mongodb
+      - ME_CONFIG_BASICAUTH_USERNAME=${MONGO_USER}
+      - ME_CONFIG_BASICAUTH_PASSWORD=${MONGO_PASSWORD}
+    depends_on:
+      - mongodb
+
+  vc_db:
+    image: mongo:latest
+    volumes:
+      - shared-database:/data/db
+    logging:
+      driver: "none"
+
+volumes:
+  shared-database:
+
+networks:
+  backnet:
+    external: true
+  frontnet:
+    external: true
