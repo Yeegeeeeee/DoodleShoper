@@ -1,3 +1,5 @@
+import base64
+
 import requests
 import logging
 
@@ -8,48 +10,40 @@ url = Config.app_settings.get('sd_address')
 
 def build_payload(prompt, base64_img):
     # A1111 payload
-    payload = {
+    return {
+        "init_images": [base64_img],
         "prompt": prompt + ", high resolution, photorealistic, high detail, 8k uhd, dslr",
         "negative_prompt": "low resolution, cropped, person, text, out of frame, worst quality, low quality, centered, wide shot",
         "sampler_name": STABLE_DIFFUSION_SAMPLER,
-        "batch_size": 1,
         "steps": 20,
         "cfg_scale": 7,
-        "alwayson_scripts": {
-            "controlnet": {
-                "args": [
-                    {
-                        "input_image": base64_img,
-                        "model": STABLE_DIFFUSION_MODEL,
-                        "module": STABLE_DIFFUSION_MODULE,
-                        "weight": STABLE_DIFFUSION_CONTROL_WEIGHT,
-                        "resize_mode": STABLE_DIFFUSION_RESIZE_MODE,
-                        "control_mode": STABLE_DIFFUSION_CONTROL_MODE,
-                        "guidance_start": 0,
-                        "guidance_end": 0.5
-                    }
-                ]
-            }
-        }
+        "denoising_strength": 0.75
     }
 
-    return payload
-
 def generate_image_stable_diffusion(prompt, base64_img):
+        logging.info(f"Prompt: {prompt}")
+        logging.info(f"Base64 Image Length: {len(base64_img) if base64_img else 0}")
 
-    logging.info(f"Searching for image with prompt: {prompt}")
+        if not base64_img or len(base64_img) < 100:
+            logging.error("Invalid base64 image data")
+            return ""
 
-    payload = build_payload(prompt, base64_img)
+        if base64_img.startswith('data:image'):
+            base64_img = base64_img.split(',')[1]
 
-    logging.info(f"Sending to {url}{STABLE_DIFFUSION_PATH}")
+        payload = build_payload(prompt, base64_img)
 
-    # Trigger Generation
-    response = requests.post(url=f'{url}{STABLE_DIFFUSION_PATH}', json=payload)
+        try:
+            response = requests.post(f'{url}{STABLE_DIFFUSION_PATH}', json=payload)
+            logging.info(f"Response Status: {response.status_code}")
+            logging.info(f"Response Body: {response.text[:500]}")
 
-    print(response)
+            if response.status_code != 200:
+                logging.error(f"Error Details: {response.text}")
+                return ""
 
-    # Read results
-    r = response.json()
-    result = r['images'][0]
+            return response.json()['images'][0]
 
-    return result.split(",", 1)[0]
+        except Exception as e:
+            logging.error(f"Generation Error: {str(e)}")
+            return ""

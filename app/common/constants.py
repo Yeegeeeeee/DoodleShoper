@@ -7,7 +7,7 @@ SKETCH_CONVERSATION = "sketch"
 CREDENTIALS_ERROR_MESSAGE = "Could not validate credentials"
 INVALID_USER_PASS_MESSAGE = "Invalid username or password"
 
-STABLE_DIFFUSION_PATH = "/sdapi/v1/txt2img"
+STABLE_DIFFUSION_PATH = "/sdapi/v1/img2img"
 STABLE_DIFFUSION_MODEL="control_v11p_sd15_scribble [d4ba51ff]"
 STABLE_DIFFUSION_MODULE="invert (from white bg & black line)"
 STABLE_DIFFUSION_SAMPLER="Euler a"

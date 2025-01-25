@@ -12,10 +12,23 @@ def init_cloudinary():
     )
 
 def upload_image_web(img_base64, img_uuid):
-    cloudinary.uploader.upload(f"data:image/png;base64,{img_base64}", public_id=img_uuid)
-    img_url = f"https://res.cloudinary.com/{Config.app_settings.get('cloudinary_name')}/image/upload/v1710862572/{img_uuid}.png"
-    logging.info("Uploaded image to cloudinary with uuid: {} and url: {}".format(img_uuid, img_url))
-    return img_url
+    try:
+        if not img_base64:
+            logging.error("Image base64 data is empty")
+            return None
+
+        cleaned_base64 = img_base64.strip() if img_base64 else ""
+
+        result = cloudinary.uploader.upload(
+            f"data:image/png;base64,{cleaned_base64}",
+            public_id=img_uuid
+        )
+        img_url = result['url']
+        logging.info(f"Uploaded image to cloudinary: {img_uuid} -> {img_url}")
+        return img_url
+    except Exception as e:
+        logging.error(f"Upload failed: {str(e)}")
+        return None
 
 def destroy_image_web(img_uuid):
     cloudinary.uploader.destroy(img_uuid)
