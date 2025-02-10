@@ -16,6 +16,8 @@ RUN --mount=type=cache,target=/var/cache/apt \
   cd /usr/lib/x86_64-linux-gnu/pkgconfig/ && \
   ln -sf opencv4.pc opencv.pc
 
+RUN --mount=type=cache,target=/root/.cache/pip \
+  pip install insightface==0.7.3
 
 ENV ROOT=/InvokeAI
 RUN git clone https://github.com/invoke-ai/InvokeAI.git ${ROOT}

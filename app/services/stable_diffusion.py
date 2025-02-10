@@ -18,12 +18,28 @@ def build_payload(prompt, base64_img):
         base64_img = base64_img.split(',')[1]
 
     payload = {
-        "init_images": [base64_img],
         "prompt": prompt + ", high resolution, photorealistic, high detail, 8k uhd, dslr",
         "negative_prompt": "low resolution, cropped, person, text, out of frame, worst quality, low quality, centered, wide shot",
+        "sampler_name": STABLE_DIFFUSION_SAMPLER,
+        "batch_size": 1,
         "steps": 20,
         "cfg_scale": 7,
-        "denoising_strength": 0.75
+        "alwayson_scripts": {
+            "controlnet": {
+                "args": [
+                    {
+                        "image": base64_img,
+                        "model": STABLE_DIFFUSION_MODEL,
+                        "module": STABLE_DIFFUSION_MODULE,
+                        "weight": STABLE_DIFFUSION_CONTROL_WEIGHT,
+                        "resize_mode": STABLE_DIFFUSION_RESIZE_MODE,
+                        "control_mode": STABLE_DIFFUSION_CONTROL_MODE,
+                        "guidance_start": 0,
+                        "guidance_end": 0.5
+                    }
+                ]
+            }
+        }
     }
 
     return payload
