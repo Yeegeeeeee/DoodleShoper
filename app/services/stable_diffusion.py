@@ -67,7 +67,7 @@ def generate_image_stable_diffusion(prompt, base64_img):
             api_url,
             json=payload,
             headers=headers,
-            timeout=30
+            timeout=60
         )
 
         response.raise_for_status()

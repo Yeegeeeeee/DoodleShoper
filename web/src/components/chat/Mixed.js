@@ -449,9 +449,14 @@ const handleKeyPress = (event) => {
 
 function transformMessageContent(messageContent) {
   try {
+    console.log("response: " + messageContent);
     const {sketch, image, text, links, thumbnails} = JSON.parse(messageContent);
 
-    console.log(links)
+    console.log("link: "+links)
+    console.log("text: " + text)
+    console.log("sketch: " + sketch)
+    console.log("image: " + image)
+    console.log("thumbnails: " + thumbnails)
 
     // Use image URLs
     const sketchImg = sketch ? `
@@ -489,6 +494,7 @@ function transformMessageContent(messageContent) {
 
     return messageHTML;
   }catch(e){
+    console.log(e)
     return messageContent;
   }
 }

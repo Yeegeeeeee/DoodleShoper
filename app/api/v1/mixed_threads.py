@@ -131,7 +131,8 @@ async def mixed_thread_run(
 
     run = client.beta.threads.runs.create(
         thread_id=thread_id,
-        assistant_id=Config.app_settings.get("openai_assistant")
+        assistant_id=Config.app_settings.get("openai_assistant"),
+        instructions="Please provide your response in JSON format following the sketch_image_text_links_thumbnails schema with sketch, image, text, links (with href and text), and thumbnails fields."
     )
 
     return RunThreadResp(id=run.id)
