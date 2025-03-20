@@ -8,6 +8,7 @@ import Chat from './components/chat/Chat';
 import Text from './components/chat/Text';
 import Mixed from './components/chat/Mixed';
 import Sketch from './components/chat/Sketch';
+import Sign from './components/chat/Sign';
 
 const App = () => {
   const isLoggedIn = !!Cookies.get('accessToken');
@@ -22,6 +23,7 @@ const App = () => {
         <Route path="/chat/text" element={isLoggedIn ? <Text /> : <Login />} />
         <Route path="/chat/mixed" element={isLoggedIn ? <Mixed /> : <Login />} />
         <Route path="/chat/sketch" element={isLoggedIn ? <Sketch /> : <Login />} />
+        <Route path="/chat/sign" element={isLoggedIn ? <Sign /> : <Login />} />
       </Routes>
     </Router>
   );

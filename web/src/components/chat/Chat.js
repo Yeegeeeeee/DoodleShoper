@@ -56,9 +56,12 @@ const Chat = () => {
         <Link to="/chat/mixed" className="option-card">
           Sketch-Based
         </Link>
-        <div className="option-card disabled">
-          Sketch-Based <br/>with SignWriting <br/> (Not yet available)
-        </div>
+        <Link to="/chat/sign" className="option-card">
+          With Sign Writing
+        </Link>
+        {/*<div className="option-card disabled">*/}
+        {/*  Sketch-Based <br/>with SignWriting <br/> (Not yet available)*/}
+        {/*</div>*/}
       </div>
     </div>
   );

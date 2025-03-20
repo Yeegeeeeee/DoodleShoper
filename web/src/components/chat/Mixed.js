@@ -105,12 +105,12 @@ useEffect(() => {
       setOverlayVisible(true);
       setOverlayShownOnce(true);
     }
+    console.log(overlayShownOnce);
   };
 
   // Function to hide overlay popup
   const hideOverlay = () => {
     setOverlayVisible(false);
-    setOverlayShownOnce(false);
   };
 
   useEffect(() => {
@@ -264,9 +264,9 @@ const handleKeyPress = (event) => {
             }
           );
           const { status, action } = response.data;
+          console.log("status: " + status + ", action: " + action);
           if (status === 'completed') {
             clearInterval(intervalId); // Stop the interval when run is completed
-            setOverlayShownOnce(false);
             // Update messages after completion
             fetchMessages(threadId);
             setLoading(false); // Set loading to false after run completion
@@ -283,7 +283,6 @@ const handleKeyPress = (event) => {
             }
           } else if (status === 'expired') {
             clearInterval(intervalId); // Stop the interval when run is completed
-            setOverlayShownOnce(false);
             // Send a an assistant message for the failure
             await axios.post(`${process.env.REACT_APP_API_URL}/api/v1/threads/mixed/${threadId}/messages/assistant`, {
               content: "{\"text\": \"Sorry, I haven't received the needed information for the search. Would you like to try again?\"}"
@@ -292,6 +291,7 @@ const handleKeyPress = (event) => {
                 Authorization: `Bearer ${accessToken}`
               }
             });
+            setOverlayShownOnce(false);
             // Update messages after completion
             fetchMessages(threadId);
             setLoading(false); // Set loading to false after run completion
@@ -307,6 +307,7 @@ const handleKeyPress = (event) => {
               Authorization: `Bearer ${accessToken}`
             }
           });
+          setOverlayShownOnce(false);
           // Update messages after completion
           fetchMessages(threadId);
         }
@@ -320,6 +321,7 @@ const handleKeyPress = (event) => {
               Authorization: `Bearer ${accessToken}`
             }
           });
+          setOverlayShownOnce(false);
           // Update messages after completion
           fetchMessages(threadId);
     }

@@ -40,6 +40,7 @@ async def create_user_resource(
         text_threads=[],
         mixed_threads=[],
         sketch_threads=[],
+        sign_threads=[],
         create_time=datetime.utcnow(),
         update_time=datetime.utcnow(),
         deleted=False,

@@ -1,6 +1,6 @@
 from typing import Mapping
 
-import mediapipe as mp
+import mediapipe_recognition as mp
 import numpy
 
 
@@ -50,7 +50,7 @@ iris_landmark_spec = {468: right_iris_draw, 473: left_iris_draw}
 
 def draw_pupils(image, landmark_list, drawing_spec, halfwidth: int = 2):
     """We have a custom function to draw the pupils because the mp.draw_landmarks method requires a parameter for all
-    landmarks.  Until our PR is merged into mediapipe, we need this separate method."""
+    landmarks.  Until our PR is merged into mediapipe_recognition, we need this separate method."""
     if len(image.shape) != 3:
         raise ValueError("Input image must be H,W,C.")
     image_rows, image_cols, image_channels = image.shape

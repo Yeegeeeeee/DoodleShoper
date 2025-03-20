@@ -6,7 +6,13 @@ ENV PYTHONUNBUFFERED=1
 
 WORKDIR /server
 
+COPY poetry.lock pyproject.toml ./
+
 RUN pip3 install poetry==1.7.1
+RUN apt-get update && apt-get install -y gcc python3-dev build-essential ffmpeg libsm6 libxext6 libxrender-dev libgl1-mesa-glx
+RUN poetry config virtualenvs.create false
+RUN poetry install --no-dev || true
+
 
 ADD ./db ./db
 ADD ./api ./api
@@ -15,12 +21,8 @@ ADD ./common ./common
 ADD ./models ./models
 ADD ./schemas ./schemas
 ADD ./services ./services
-COPY poetry.lock pyproject.toml main.py __init__.py ./
+COPY main.py __init__.py ./
 COPY .env .env
-
-RUN apt-get update && apt-get install -y gcc python3-dev build-essential
-RUN poetry config virtualenvs.create false
-RUN poetry install --no-dev
 
 CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8080"]
 
