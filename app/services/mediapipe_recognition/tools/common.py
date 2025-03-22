@@ -1,0 +1,1 @@
+labels = ["me", "want", "find", "cloth", "hat", "phone", "cotton", "black", "red", "leather", "baseball", "jacket", "t-shirt"]
