@@ -8,6 +8,7 @@ const SignWriting = ({showCamera, setShowCamera, setNewMessage, username, answer
   const [recording, setRecording] = useState(false);
   const [videoBlob, setVideoBlob] = useState(null);
   const [playbackUrl, setPlaybackUrl] = useState(null);
+  const[uploading, setUploading] = useState(false);
 
   const startRecording = async () => {
     const stream = await navigator.mediaDevices.getUserMedia({ video: true });
@@ -41,25 +42,33 @@ const SignWriting = ({showCamera, setShowCamera, setNewMessage, username, answer
 
   const uploadVideo = async () => {
     if (!videoBlob) return;
+
+    setUploading(true);
+
     const formData = new FormData();
     formData.append("videoFile", videoBlob, "sign_language_video.webm");
     formData.append("username", username);
     formData.append("answer", answer);
     console.log("Username is "+username+" and Answer is "+answer);
+    try {
+      const accessToken = Cookies.get('accessToken');
+      const response = await axios.post(`${process.env.REACT_APP_API_URL}/api/v1/threads/sign/sign_writing`,
+          formData, {
+            headers: {
+              Authorization: `Bearer ${accessToken}`,
+              "Content-Type": "multipart/form-data"
+            },
+          });
 
-    const accessToken = Cookies.get('accessToken');
-    const response = await axios.post(`${process.env.REACT_APP_API_URL}/api/v1/threads/sign/sign_writing`,
-      formData,{
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-          "Content-Type": "multipart/form-data"
-        },
-        });
-
-    const text = response.data;
-    setNewMessage(text);
-    if(showCamera){
-      setShowCamera(false);
+      const text = response.data;
+      setNewMessage(text);
+      if (showCamera) {
+        setShowCamera(false);
+      }
+    }catch(error){
+      console.error("Upload failed:", error);
+    }finally{
+      setUploading(false);
     }
   };
 
@@ -77,7 +86,7 @@ const SignWriting = ({showCamera, setShowCamera, setNewMessage, username, answer
         <button onClick={stopRecording}>⏹ Stop Recording</button>
       )}
 
-      <button onClick={uploadVideo} disabled={!videoBlob}>
+      <button onClick={uploadVideo} disabled={!videoBlob || uploading}>
         📤 Upload Video
       </button>
     </div>

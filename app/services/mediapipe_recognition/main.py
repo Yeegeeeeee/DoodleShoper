@@ -2,6 +2,7 @@ import cv2
 import mediapipe as mp
 import time
 import torch as t
+import torch.nn.functional as F
 from .model import HandModel
 from .tools.landmark_handle import landmark_handle
 from .tools.draw_landmarks import draw_landmarks
@@ -56,7 +57,7 @@ def sign_language_recognition(filepath):
     # time1 = time.time()
     fps = 0
     threshold = 0.7
-    min_confidence = -500
+    min_confidence = 0.9
     word_time = {}
     last_label = None
     min_count = 20
@@ -100,15 +101,18 @@ def sign_language_recognition(filepath):
             value = output[0, index].item()
             this_label = label[index]
             current_time = time.time()
-            # if value < min_confidence:
-            #     logging.info(f"Confidence too low, skipping -- [{this_label}] -- [{value}]")
-            #     continue
+            prob = F.softmax(output, dim=1)
+            confidence = prob[0, index].item()
+            # confidence = value
+            if confidence < min_confidence:
+                logging.info(f"Confidence too low, skipping -- [{this_label}] -- [{confidence}]")
+                continue
 
             if this_label == last_label:
                 if this_label not in word_count:
                     word_count[this_label] = 0
 
-                logging.info(f"Word {this_label} count is {word_count[this_label]}, Confidence: {value}, time: {current_time - word_time[this_label]}")
+                logging.info(f"Word {this_label} count is {word_count[this_label]}, Confidence: {confidence}, time: {current_time - word_time[this_label]}")
                 if this_label in word_time and (current_time - word_time[this_label]) < threshold:
                     word_count[this_label] += 1
 
